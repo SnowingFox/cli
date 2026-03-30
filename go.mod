@@ -55,7 +55,9 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/gitleaks/go-gitdiff v0.9.1 // indirect
 	github.com/go-git/gcfg/v2 v2.0.2 // indirect
-	github.com/go-git/go-billy/v6 v6.0.0-20260226131633-45bd0956d66f // indirect
+	github.com/go-git/go-billy/v6 v6.0.0-20260328065524-593ae452e14d // indirect
+	github.com/go-git/x/plugin/objectsigner/gpg v0.1.0 // indirect
+	github.com/go-git/x/plugin/objectsigner/ssh v0.1.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
@@ -65,6 +67,7 @@ require (
 	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/hiddeco/sshsig v0.2.0 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kevinburke/ssh_config v1.6.0 // indirect
