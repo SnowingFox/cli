@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/go-git/go-git/v6/x/plugin"
 	"github.com/go-git/x/plugin/objectsigner/auto"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh/agent"
 )
 
 func main() {
@@ -55,7 +57,7 @@ func registerObjectSigner() {
 	plugin.Register(plugin.ObjectSigner(), func() plugin.Signer {
 		cfgSource, err := plugin.Get(plugin.ConfigLoader())
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to load config loader plugin: %v\n", err)
+			// No config loader registered; signing not possible.
 			return nil
 		}
 
@@ -65,10 +67,17 @@ func registerObjectSigner() {
 		// Merge system then global so that global settings take precedence.
 		merged := config.Merge(sysCfg, globalCfg)
 
-		signer, err := auto.FromConfig(auto.Config{
+		if !merged.Commit.GpgSign.IsTrue() {
+			return nil
+		}
+
+		cfg := auto.Config{
 			SigningKey: merged.User.SigningKey,
 			Format:     auto.Format(merged.GPG.Format),
-		})
+			SSHAgent:   connectSSHAgent(),
+		}
+
+		signer, err := auto.FromConfig(cfg)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "warning: failed to create object signer: %v\n", err)
 			return nil
@@ -76,6 +85,22 @@ func registerObjectSigner() {
 
 		return signer
 	})
+}
+
+// connectSSHAgent connects to the SSH agent via SSH_AUTH_SOCK.
+// Returns nil if the agent is unavailable.
+func connectSSHAgent() agent.Agent {
+	sock := os.Getenv("SSH_AUTH_SOCK")
+	if sock == "" {
+		return nil
+	}
+
+	conn, err := net.Dial("unix", sock)
+	if err != nil {
+		return nil
+	}
+
+	return agent.NewClient(conn)
 }
 
 var scopeName = map[config.Scope]string{
