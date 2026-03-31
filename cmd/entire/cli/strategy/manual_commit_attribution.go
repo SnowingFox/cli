@@ -185,6 +185,11 @@ func countLinesStr(content string) int {
 // For initial commits (no parent), falls back to attributionBaseCommit→headCommitHash.
 // When hashes are empty, falls back to go-git tree walk.
 //
+// parentTree is the tree of the parent commit (nil for initial commits). When provided
+// alongside parentCommitHash, non-agent file line counting uses parentTree instead of
+// baseTree so that only THIS commit's changes are counted (consistent with the file
+// scoping from parentCommitHash→headCommitHash).
+//
 // Note: Binary files (detected by null bytes) are silently excluded from attribution
 // calculations since line-based diffing only applies to text files.
 //
@@ -200,6 +205,7 @@ func CalculateAttributionWithAccumulated(
 	parentCommitHash string,
 	attributionBaseCommit string,
 	headCommitHash string,
+	parentTree *object.Tree,
 ) *checkpoint.InitialAttribution {
 	if len(filesTouched) == 0 {
 		return nil
@@ -253,7 +259,13 @@ func CalculateAttributionWithAccumulated(
 	if diffBaseCommit == "" {
 		diffBaseCommit = attributionBaseCommit
 	}
-	allChangedFiles, err := getAllChangedFiles(ctx, baseTree, headTree, repoDir, diffBaseCommit, headCommitHash)
+	// Use parentTree for line counting when available (consistent with file scoping).
+	// For initial commits, fall back to session baseTree.
+	nonAgentDiffTree := parentTree
+	if nonAgentDiffTree == nil {
+		nonAgentDiffTree = baseTree
+	}
+	allChangedFiles, err := getAllChangedFiles(ctx, nonAgentDiffTree, headTree, repoDir, diffBaseCommit, headCommitHash)
 	if err != nil {
 		logging.Warn(logging.WithComponent(ctx, "attribution"),
 			"attribution: failed to enumerate changed files",
@@ -267,9 +279,9 @@ func CalculateAttributionWithAccumulated(
 			continue // Skip agent-touched files
 		}
 
-		baseContent := getFileContent(baseTree, filePath)
+		diffBaseContent := getFileContent(nonAgentDiffTree, filePath)
 		headContent := getFileContent(headTree, filePath)
-		_, userAdded, _ := diffLines(baseContent, headContent)
+		_, userAdded, _ := diffLines(diffBaseContent, headContent)
 		allUserEditsToNonAgentFiles += userAdded
 	}
 
