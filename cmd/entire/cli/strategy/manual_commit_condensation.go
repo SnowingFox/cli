@@ -96,6 +96,7 @@ type condenseOpts struct {
 	repoDir          string              // Repository worktree path for git CLI commands
 	parentCommitHash string              // HEAD's first parent hash for per-commit non-agent file detection
 	headCommitHash   string              // HEAD commit hash (passed through for attribution)
+	treeHash         string              // Tree hash of the commit being condensed (for fallback linkage after history rewrites)
 }
 
 // CondenseSession condenses a session's shadow branch to permanent storage.
@@ -230,6 +231,7 @@ func (s *ManualCommitStrategy) CondenseSession(ctx context.Context, repo *git.Re
 		AuthorEmail:                 authorEmail,
 		Agent:                       state.AgentType,
 		Model:                       state.ModelName,
+		TreeHash:                    o.treeHash,
 		TurnID:                      state.TurnID,
 		TranscriptIdentifierAtStart: state.TranscriptIdentifierAtStart,
 		CheckpointTranscriptStart:   state.CheckpointTranscriptStart,

@@ -663,6 +663,7 @@ func (h *postCommitActionHandler) HandleCondense(state *session.State) error {
 			repoDir:          h.repoDir,
 			parentCommitHash: h.parentCommitHash(),
 			headCommitHash:   h.newHead,
+			treeHash:         h.commit.TreeHash.String(),
 		})
 	} else {
 		h.s.updateBaseCommitIfChanged(h.ctx, state, h.newHead)
@@ -691,6 +692,7 @@ func (h *postCommitActionHandler) HandleCondenseIfFilesTouched(state *session.St
 			repoDir:          h.repoDir,
 			parentCommitHash: h.parentCommitHash(),
 			headCommitHash:   h.newHead,
+			treeHash:         h.commit.TreeHash.String(),
 		})
 	} else {
 		h.s.updateBaseCommitIfChanged(h.ctx, state, h.newHead)
