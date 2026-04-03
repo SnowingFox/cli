@@ -26,6 +26,9 @@ import (
 
 const testTrailerCheckpointID id.CheckpointID = "a1b2c3d4e5f6"
 
+// testTranscriptPromptResponse is a minimal transcript used across strategy tests.
+const testTranscriptPromptResponse = "{\"type\":\"human\",\"message\":{\"content\":\"test prompt\"}}\n{\"type\":\"assistant\",\"message\":{\"content\":\"test response\"}}\n"
+
 func TestShadowStrategy_ValidateRepository(t *testing.T) {
 	dir := t.TempDir()
 	_, err := git.PlainInit(dir, false)
@@ -826,6 +829,42 @@ func TestShadowStrategy_PrepareCommitMsg_SkipSources(t *testing.T) {
 	}
 }
 
+func TestShadowStrategy_PrepareCommitMsg_SkipsSessionWhenContentCheckFails(t *testing.T) {
+	dir := setupGitRepo(t)
+	t.Chdir(dir)
+	t.Setenv("ENTIRE_TEST_TTY", "1")
+
+	repo, err := git.PlainOpen(dir)
+	require.NoError(t, err)
+
+	s := &ManualCommitStrategy{}
+
+	err = s.InitializeSession(context.Background(), "test-session-corrupt-shadow", agent.AgentTypeClaudeCode, "", "", "")
+	require.NoError(t, err)
+
+	state, err := s.loadSessionState(context.Background(), "test-session-corrupt-shadow")
+	require.NoError(t, err)
+	require.NotNil(t, state)
+
+	shadowBranch := getShadowBranchNameForCommit(state.BaseCommit, state.WorktreeID)
+	corruptRef := plumbing.NewHashReference(plumbing.NewBranchReferenceName(shadowBranch), plumbing.ZeroHash)
+	require.NoError(t, repo.Storer.SetReference(corruptRef))
+
+	commitMsgFile := filepath.Join(t.TempDir(), "COMMIT_EDITMSG")
+	originalMsg := "Test commit\n"
+	require.NoError(t, os.WriteFile(commitMsgFile, []byte(originalMsg), 0o644))
+
+	err = s.PrepareCommitMsg(context.Background(), commitMsgFile, "")
+	require.NoError(t, err)
+
+	content, err := os.ReadFile(commitMsgFile)
+	require.NoError(t, err)
+
+	_, found := trailers.ParseCheckpoint(string(content))
+	require.False(t, found, "corrupt session state should not add a dangling checkpoint trailer")
+	require.Equal(t, originalMsg, string(content))
+}
+
 // TestShadowStrategy_PrepareCommitMsg_AgentRevertGetsTrailer verifies that when an
 // agent runs git revert (REVERT_HEAD exists) and the session is ACTIVE, the commit
 // gets a checkpoint trailer. The agent's work should be checkpointed.
@@ -1594,7 +1633,7 @@ func TestShadowStrategy_CondenseSession_EphemeralBranchTrailer(t *testing.T) {
 		t.Fatalf("failed to create metadata dir: %v", err)
 	}
 
-	if err := os.WriteFile(filepath.Join(metadataDirAbs, paths.TranscriptFileName), []byte(testTranscript), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(metadataDirAbs, paths.TranscriptFileName), []byte(testTranscriptPromptResponse), 0o644); err != nil {
 		t.Fatalf("failed to write transcript: %v", err)
 	}
 
