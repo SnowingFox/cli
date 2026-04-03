@@ -1,14 +1,11 @@
 {
   "enabled": true,
   "local_dev": true,
+  "strategy": "manual-commit",
   "strategy_options": {
     "checkpoint_remote": {
       "provider": "github",
       "repo": "entireio/cli-checkpoints"
     }
-  },
-  "telemetry": true,
-  "commit_linking": "always",
-  "external_agents": true,
-  "strategy": "manual-commit"
+  }
 }

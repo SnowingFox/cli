@@ -1,152 +1,15 @@
 {
   "context": {
-    "fileName": [
-      "AGENTS.md"
-    ]
+    "fileName": ["AGENTS.md"]
   },
   "hooks": {
-    "AfterAgent": [
+    "SessionStart": [
       {
         "hooks": [
           {
-            "name": "entire-after-agent",
+            "name": "entire-session-start",
             "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini after-agent"
-          },
-          {
-            "name": "entire-after-agent",
-            "type": "command",
-            "command": "entire hooks gemini after-agent"
-          }
-        ]
-      }
-    ],
-    "AfterModel": [
-      {
-        "hooks": [
-          {
-            "name": "entire-after-model",
-            "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini after-model"
-          },
-          {
-            "name": "entire-after-model",
-            "type": "command",
-            "command": "entire hooks gemini after-model"
-          }
-        ]
-      }
-    ],
-    "AfterTool": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "name": "entire-after-tool",
-            "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini after-tool"
-          },
-          {
-            "name": "entire-after-tool",
-            "type": "command",
-            "command": "entire hooks gemini after-tool"
-          }
-        ]
-      }
-    ],
-    "BeforeAgent": [
-      {
-        "hooks": [
-          {
-            "name": "entire-before-agent",
-            "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini before-agent"
-          },
-          {
-            "name": "entire-before-agent",
-            "type": "command",
-            "command": "entire hooks gemini before-agent"
-          }
-        ]
-      }
-    ],
-    "BeforeModel": [
-      {
-        "hooks": [
-          {
-            "name": "entire-before-model",
-            "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini before-model"
-          },
-          {
-            "name": "entire-before-model",
-            "type": "command",
-            "command": "entire hooks gemini before-model"
-          }
-        ]
-      }
-    ],
-    "BeforeTool": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "name": "entire-before-tool",
-            "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini before-tool"
-          },
-          {
-            "name": "entire-before-tool",
-            "type": "command",
-            "command": "entire hooks gemini before-tool"
-          }
-        ]
-      }
-    ],
-    "BeforeToolSelection": [
-      {
-        "hooks": [
-          {
-            "name": "entire-before-tool-selection",
-            "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini before-tool-selection"
-          },
-          {
-            "name": "entire-before-tool-selection",
-            "type": "command",
-            "command": "entire hooks gemini before-tool-selection"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "name": "entire-notification",
-            "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini notification"
-          },
-          {
-            "name": "entire-notification",
-            "type": "command",
-            "command": "entire hooks gemini notification"
-          }
-        ]
-      }
-    ],
-    "PreCompress": [
-      {
-        "hooks": [
-          {
-            "name": "entire-pre-compress",
-            "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini pre-compress"
-          },
-          {
-            "name": "entire-pre-compress",
-            "type": "command",
-            "command": "entire hooks gemini pre-compress"
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini session-start"
           }
         ]
       }
@@ -159,11 +22,6 @@
             "name": "entire-session-end-exit",
             "type": "command",
             "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini session-end"
-          },
-          {
-            "name": "entire-session-end-exit",
-            "type": "command",
-            "command": "entire hooks gemini session-end"
           }
         ]
       },
@@ -174,34 +32,111 @@
             "name": "entire-session-end-logout",
             "type": "command",
             "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini session-end"
-          },
-          {
-            "name": "entire-session-end-logout",
-            "type": "command",
-            "command": "entire hooks gemini session-end"
           }
         ]
       }
     ],
-    "SessionStart": [
+    "BeforeAgent": [
       {
         "hooks": [
           {
-            "name": "entire-session-start",
+            "name": "entire-before-agent",
             "type": "command",
-            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini session-start"
-          },
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini before-agent"
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "hooks": [
           {
-            "name": "entire-session-start",
+            "name": "entire-after-agent",
             "type": "command",
-            "command": "entire hooks gemini session-start"
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini after-agent"
+          }
+        ]
+      }
+    ],
+    "BeforeModel": [
+      {
+        "hooks": [
+          {
+            "name": "entire-before-model",
+            "type": "command",
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini before-model"
+          }
+        ]
+      }
+    ],
+    "AfterModel": [
+      {
+        "hooks": [
+          {
+            "name": "entire-after-model",
+            "type": "command",
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini after-model"
+          }
+        ]
+      }
+    ],
+    "BeforeToolSelection": [
+      {
+        "hooks": [
+          {
+            "name": "entire-before-tool-selection",
+            "type": "command",
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini before-tool-selection"
+          }
+        ]
+      }
+    ],
+    "BeforeTool": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "entire-before-tool",
+            "type": "command",
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini before-tool"
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "entire-after-tool",
+            "type": "command",
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini after-tool"
+          }
+        ]
+      }
+    ],
+    "PreCompress": [
+      {
+        "hooks": [
+          {
+            "name": "entire-pre-compress",
+            "type": "command",
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini pre-compress"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "name": "entire-notification",
+            "type": "command",
+            "command": "go run \"$(git rev-parse --show-toplevel)\"/cmd/entire/main.go hooks gemini notification"
           }
         ]
       }
     ]
-  },
-  "hooksConfig": {
-    "enabled": true
   },
   "tools": {
     "enableHooks": true
