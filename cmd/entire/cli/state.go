@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -288,64 +289,59 @@ func DetectFileChanges(ctx context.Context, previouslyUntracked []string) (*File
 // filterToUncommittedFiles removes files from the list that are already committed to HEAD
 // with matching content. This prevents re-adding files that an agent committed mid-turn
 // (already condensed by PostCommit) back to FilesTouched via SaveStep. Files not in
-// HEAD or with different content in the working tree are kept. Fails open: if any git
-// operation errors, returns the original list unchanged.
+// HEAD or with different content in the working tree are kept. Fails open: if git
+// errors (e.g. bare repo, no HEAD), returns the original list unchanged.
+//
+// Uses the git CLI instead of go-git to avoid index lock contention on Windows and
+// to ensure consistent autocrlf/eol handling (git CLI respects system-level config,
+// while go-git's content comparison would need manual CRLF normalization).
 func filterToUncommittedFiles(ctx context.Context, files []string, repoRoot string) []string {
 	if len(files) == 0 {
 		return files
 	}
 
-	repo, err := openRepository(ctx)
+	// git diff --name-only HEAD -- <files> prints only files that differ from HEAD.
+	// Empty output means all files match HEAD (already committed). Exit 0 on success,
+	// non-zero (128) only on fatal errors (no HEAD, not a repo, etc.).
+	args := append([]string{"diff", "--name-only", "HEAD", "--"}, files...)
+	cmd := exec.CommandContext(ctx, "git", args...)
+	cmd.Dir = repoRoot
+	out, err := cmd.Output()
 	if err != nil {
-		return files // fail open
+		// Capture stderr for diagnostics (exec.ExitError carries it).
+		var stderr string
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			stderr = string(exitErr.Stderr)
+		}
+		// Fail open: no HEAD (empty repo, initial commit), not a git repo, etc.
+		logging.Warn(ctx, "filterToUncommittedFiles: git diff failed, keeping all files as uncommitted",
+			slog.String("error", err.Error()),
+			slog.String("stderr", stderr),
+			slog.String("dir", repoRoot),
+			slog.Any("files", files))
+		return files
 	}
 
-	head, err := repo.Head()
-	if err != nil {
-		return files // fail open (empty repo, detached HEAD, etc.)
+	trimmed := strings.TrimRight(string(out), "\n")
+	if trimmed == "" {
+		return nil // all files are committed with matching content
 	}
 
-	commit, err := repo.CommitObject(head.Hash())
-	if err != nil {
-		return files // fail open
-	}
-
-	headTree, err := commit.Tree()
-	if err != nil {
-		return files // fail open
+	// Build a set of files that actually differ from HEAD.
+	diffSet := make(map[string]bool)
+	for _, line := range strings.Split(trimmed, "\n") {
+		if line != "" {
+			diffSet[filepath.ToSlash(line)] = true
+		}
 	}
 
 	var result []string
-	for _, relPath := range files {
-		headFile, err := headTree.File(relPath)
-		if err != nil {
-			// File not in HEAD — it's uncommitted
-			result = append(result, relPath)
-			continue
+	for _, f := range files {
+		if diffSet[f] {
+			result = append(result, f)
 		}
-
-		// File is in HEAD — compare content with working tree
-		absPath := filepath.Join(repoRoot, relPath)
-		workingContent, err := os.ReadFile(absPath) //nolint:gosec // path from controlled source
-		if err != nil {
-			// Can't read working tree file (deleted?) — keep it
-			result = append(result, relPath)
-			continue
-		}
-
-		headContent, err := headFile.Contents()
-		if err != nil {
-			result = append(result, relPath)
-			continue
-		}
-
-		if string(workingContent) != headContent {
-			// Working tree differs from HEAD — uncommitted changes
-			result = append(result, relPath)
-		}
-		// else: content matches HEAD — already committed, skip
 	}
-
 	return result
 }
 
