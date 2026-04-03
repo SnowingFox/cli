@@ -300,9 +300,9 @@ func filterToUncommittedFiles(ctx context.Context, files []string, repoRoot stri
 		return files
 	}
 
-	// git diff --name-only HEAD -- <files> prints only files that differ from HEAD.
-	// Empty output means all files match HEAD (already committed). Exit 0 on success,
-	// non-zero (128) only on fatal errors (no HEAD, not a repo, etc.).
+	// git diff --name-only HEAD -- <files> prints files that differ from HEAD.
+	// Empty output means tracked files match HEAD, but it does NOT include untracked files.
+	// We handle untracked files separately via git ls-files --others.
 	args := append([]string{"diff", "--name-only", "HEAD", "--"}, files...)
 	cmd := exec.CommandContext(ctx, "git", args...)
 	cmd.Dir = repoRoot
@@ -323,22 +323,52 @@ func filterToUncommittedFiles(ctx context.Context, files []string, repoRoot stri
 		return files
 	}
 
+	// git ls-files --others -- <files> prints untracked files (including ignored ones).
+	// This preserves the contract that files not in HEAD are kept as uncommitted.
+	untrackedArgs := append([]string{"ls-files", "--others", "--"}, files...)
+	untrackedCmd := exec.CommandContext(ctx, "git", untrackedArgs...)
+	untrackedCmd.Dir = repoRoot
+	untrackedOut, untrackedErr := untrackedCmd.Output()
+	if untrackedErr != nil {
+		var stderr string
+		var exitErr *exec.ExitError
+		if errors.As(untrackedErr, &exitErr) {
+			stderr = string(exitErr.Stderr)
+		}
+		logging.Warn(ctx, "filterToUncommittedFiles: git ls-files failed, keeping all files as uncommitted",
+			slog.String("error", untrackedErr.Error()),
+			slog.String("stderr", stderr),
+			slog.String("dir", repoRoot),
+			slog.Any("files", files))
+		return files
+	}
+
 	trimmed := strings.TrimRight(string(out), "\n")
-	if trimmed == "" {
+	trimmedUntracked := strings.TrimRight(string(untrackedOut), "\n")
+	if trimmed == "" && trimmedUntracked == "" {
 		return nil // all files are committed with matching content
 	}
 
-	// Build a set of files that actually differ from HEAD.
+	// Build sets of files that are uncommitted:
+	// - files differing from HEAD
+	// - files not tracked in HEAD (currently untracked)
 	diffSet := make(map[string]bool)
 	for _, line := range strings.Split(trimmed, "\n") {
 		if line != "" {
 			diffSet[filepath.ToSlash(line)] = true
 		}
 	}
+	untrackedSet := make(map[string]bool)
+	for _, line := range strings.Split(trimmedUntracked, "\n") {
+		if line != "" {
+			untrackedSet[filepath.ToSlash(line)] = true
+		}
+	}
 
 	var result []string
 	for _, f := range files {
-		if diffSet[f] {
+		path := filepath.ToSlash(f)
+		if diffSet[path] || untrackedSet[path] {
 			result = append(result, f)
 		}
 	}

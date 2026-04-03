@@ -9,6 +9,7 @@ import (
 
 	"github.com/entireio/cli/cmd/entire/cli/agent/claudecode"
 	"github.com/entireio/cli/cmd/entire/cli/paths"
+	"github.com/entireio/cli/cmd/entire/cli/testutil"
 	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing/object"
 	"github.com/stretchr/testify/require"
@@ -794,5 +795,57 @@ func TestMergeUnique(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestFilterToUncommittedFiles_KeepsUntrackedFiles(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	testutil.InitRepo(t, tmpDir)
+	testutil.WriteFile(t, tmpDir, "tracked.txt", "tracked content")
+	testutil.GitAdd(t, tmpDir, "tracked.txt")
+	testutil.GitCommit(t, tmpDir, "initial commit")
+
+	testutil.WriteFile(t, tmpDir, "untracked.txt", "new file content")
+
+	files := []string{"tracked.txt", "untracked.txt"}
+	got := filterToUncommittedFiles(context.Background(), files, tmpDir)
+
+	want := []string{"untracked.txt"}
+	if len(got) != len(want) {
+		t.Fatalf("filterToUncommittedFiles() = %v, want %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("filterToUncommittedFiles()[%d] = %q, want %q", i, got[i], want[i])
+		}
+	}
+}
+
+func TestFilterToUncommittedFiles_KeepsTrackedDiffsAndUntracked(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	testutil.InitRepo(t, tmpDir)
+	testutil.WriteFile(t, tmpDir, "tracked.txt", "tracked content")
+	testutil.GitAdd(t, tmpDir, "tracked.txt")
+	testutil.GitCommit(t, tmpDir, "initial commit")
+
+	// tracked.txt now differs from HEAD, and untracked.txt is not in HEAD.
+	testutil.WriteFile(t, tmpDir, "tracked.txt", "updated tracked content")
+	testutil.WriteFile(t, tmpDir, "untracked.txt", "new file content")
+
+	files := []string{"tracked.txt", "untracked.txt"}
+	got := filterToUncommittedFiles(context.Background(), files, tmpDir)
+
+	want := []string{"tracked.txt", "untracked.txt"}
+	if len(got) != len(want) {
+		t.Fatalf("filterToUncommittedFiles() = %v, want %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("filterToUncommittedFiles()[%d] = %q, want %q", i, got[i], want[i])
+		}
 	}
 }

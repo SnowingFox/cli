@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -187,6 +188,10 @@ var msysDrivePrefix = regexp.MustCompile(`^/([a-zA-Z])/`)
 //
 // Returns the input unchanged on non-Windows or if the path doesn't match.
 func NormalizeMSYSPath(p string) string {
+	if runtime.GOOS != "windows" {
+		return p
+	}
+
 	if m := msysDrivePrefix.FindStringSubmatch(p); m != nil {
 		return strings.ToUpper(m[1]) + ":/" + p[3:]
 	}

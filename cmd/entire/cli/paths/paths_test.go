@@ -3,6 +3,7 @@ package paths
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -119,5 +120,29 @@ func TestGetClaudeProjectDir_Default(t *testing.T) {
 
 	if result != expected {
 		t.Errorf("GetClaudeProjectDir() = %q, want %q", result, expected)
+	}
+}
+
+func TestNormalizeMSYSPath_NonWindows_NoRewrite(t *testing.T) {
+	t.Parallel()
+
+	if runtime.GOOS == "windows" {
+		t.Skip("non-Windows behavior test")
+	}
+
+	tests := []string{
+		"/c/Users/test/repo/file.txt",
+		"/D/work/project/main.go",
+		"/tmp/repo/file.txt",
+		"/tmp",
+	}
+
+	for _, input := range tests {
+		t.Run(input, func(t *testing.T) {
+			got := NormalizeMSYSPath(input)
+			if got != input {
+				t.Errorf("NormalizeMSYSPath(%q) = %q, want unchanged %q", input, got, input)
+			}
+		})
 	}
 }
