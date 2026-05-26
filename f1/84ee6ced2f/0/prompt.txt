@@ -1,0 +1,25 @@
+resume
+
+---
+
+resume
+
+---
+
+你为什么停了？
+
+---
+
+resume
+
+---
+
+resume
+
+---
+
+可以参考更新一下 .cursor/hooks.json 参考 .claude/hooks.json，走本地编译
+
+---
+
+可以参考更新一下 .cursor/hooks.json 参考 .claude/hooks.json，走本地编译
