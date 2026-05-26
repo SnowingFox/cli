@@ -1,0 +1,26 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "2a89e658287e",
+  "strategy": "manual-commit",
+  "branch": "feat/cursor-hook-guard-and-tokens",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "cmd/entire/cli/agent/cursor/lifecycle.go",
+    "cmd/entire/cli/agent/cursor/lifecycle_test.go",
+    "cmd/entire/cli/agent/cursor/types.go",
+    "cmd/entire/cli/agent/event.go",
+    "cmd/entire/cli/hook_guard.go",
+    "cmd/entire/cli/hook_guard_test.go",
+    "cmd/entire/cli/hook_registry.go",
+    "cmd/entire/cli/lifecycle.go",
+    "cmd/entire/cli/lifecycle_test.go"
+  ],
+  "sessions": [
+    {
+      "metadata": "/2a/89e658287e/0/metadata.json",
+      "transcript": "/2a/89e658287e/0/full.jsonl",
+      "content_hash": "/2a/89e658287e/0/content_hash.txt",
+      "prompt": "/2a/89e658287e/0/prompt.txt"
+    }
+  ]
+}
