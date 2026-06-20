@@ -3,7 +3,7 @@
   "checkpoint_id": "f184ee6ced2f",
   "strategy": "manual-commit",
   "branch": "feat/external-git-hooks",
-  "checkpoints_count": 3,
+  "checkpoints_count": 4,
   "files_touched": [
     "CHANGELOG.md",
     "cmd/entire/cli/doctor.go",
@@ -30,8 +30,21 @@
       "transcript": "/f1/84ee6ced2f/1/full.jsonl",
       "content_hash": "/f1/84ee6ced2f/1/content_hash.txt",
       "prompt": "/f1/84ee6ced2f/1/prompt.txt"
+    },
+    {
+      "metadata": "/f1/84ee6ced2f/2/metadata.json",
+      "transcript": "/f1/84ee6ced2f/2/full.jsonl",
+      "content_hash": "/f1/84ee6ced2f/2/content_hash.txt",
+      "prompt": "/f1/84ee6ced2f/2/prompt.txt"
     }
   ],
+  "token_usage": {
+    "input_tokens": 225202,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 5181056,
+    "output_tokens": 20685,
+    "api_call_count": 47
+  },
   "combined_attribution": {
     "calculated_at": "2026-05-26T08:09:35.84261Z",
     "agent_lines": 1242,
