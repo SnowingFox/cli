@@ -1,0 +1,9 @@
+/https://github.com/entireio/cli/pull/1265 看看这个改动，用 GH CLI
+
+然后看看改动的是不是合理呢？以及处理一下冲突 rebase 到最新分支
+
+/grill-me
+
+---
+
+plan mode 问我啊，用中文
