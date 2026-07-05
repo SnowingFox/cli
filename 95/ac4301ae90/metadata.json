@@ -1,0 +1,24 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "95ac4301ae90",
+  "strategy": "manual-commit",
+  "branch": "feat/external-git-hooks",
+  "checkpoints_count": 8,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/95/ac4301ae90/0/metadata.json",
+      "transcript": "/95/ac4301ae90/0/full.jsonl",
+      "compact_transcript": "/95/ac4301ae90/0/transcript.jsonl",
+      "content_hash": "/95/ac4301ae90/0/content_hash.txt",
+      "prompt": "/95/ac4301ae90/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 2857,
+    "cache_creation_tokens": 3167200,
+    "cache_read_tokens": 49972999,
+    "output_tokens": 126316,
+    "api_call_count": 257
+  }
+}
