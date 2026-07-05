@@ -1,0 +1,19 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "78e392b16663",
+  "strategy": "manual-commit",
+  "branch": "feat/external-git-hooks",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "cmd/entire/cli/doctor_test.go"
+  ],
+  "sessions": [
+    {
+      "metadata": "/78/e392b16663/0/metadata.json",
+      "transcript": "/78/e392b16663/0/full.jsonl",
+      "compact_transcript": "/78/e392b16663/0/transcript.jsonl",
+      "content_hash": "/78/e392b16663/0/content_hash.txt",
+      "prompt": ""
+    }
+  ]
+}
