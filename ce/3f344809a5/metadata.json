@@ -1,0 +1,28 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "ce3f344809a5",
+  "strategy": "manual-commit",
+  "branch": "feat/external-git-hooks",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "CHANGELOG.md",
+    "cmd/entire/cli/integration_test/external_hooks_test.go",
+    "docs/architecture/external-git-hooks.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/ce/3f344809a5/0/metadata.json",
+      "transcript": "/ce/3f344809a5/0/full.jsonl",
+      "compact_transcript": "/ce/3f344809a5/0/transcript.jsonl",
+      "content_hash": "/ce/3f344809a5/0/content_hash.txt",
+      "prompt": "/ce/3f344809a5/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 3248,
+    "cache_creation_tokens": 6077783,
+    "cache_read_tokens": 95942129,
+    "output_tokens": 202049,
+    "api_call_count": 381
+  }
+}
