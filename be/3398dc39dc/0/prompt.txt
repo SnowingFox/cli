@@ -1,0 +1,29 @@
+Stage the changes you worked on, commit, and push for this branch.
+- Current branch: feat/external-git-hooks.
+- Base branch: main.
+- Stage the changes you worked on.
+- If there are unrelated files or changes, exclude them.
+- Write a concise commit message.
+- Push after creating the commit.
+- Do not include unrelated files in the commit.
+<timestamp>Tuesday, May 26, 2026, 4:08 PM (UTC+8)</timestamp>
+
+Execute the selected diff-tab commit-and-push action.
+
+---
+
+/grill-me /session-handoff https://github.com/entireio/cli/pull/1265
+
+
+看看这个，看看有没有更好的方法呢？
+
+用 gh cli
+
+---
+
+/grill-me /session-handoff  https://github.com/entireio/cli/pull/1265
+
+
+看看这个，看看有没有更好的方法呢？
+
+用 gh cli
